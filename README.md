@@ -2,7 +2,7 @@
 
 Soxy has a simple design.  Run a `soxy` server behind your Ingress or other HTTP reverse proxy such as nginx.
 
-When a client connects to the `soxy` server, it asks the server to establish a websocket connection to a back-end service.  Once the connection is established, the client will accept connections on a local port and forward traffic to the remote end.  
+When a client connects to the `soxy` server, the server opens a connection to the backend service and pipes the data back to a local port.  
 
 My test rig is a k8s cluster with `ingress-nginx` providing HTTPS termination.  This makes it easy to secure the traffic on your tunnels.
 

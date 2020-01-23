@@ -21,13 +21,13 @@ soxy serve -p :8080
 This will start a client on your local laptop, proxying connections on port 8479 to `mongodb-service:27017` as seen from the proxy.
 
 ```
-soxy proxy -U ws://soxy-server.com -L :8479 -R mongodb-service:27017
+soxy proxy -U ws://soxy-server.com:8080 -L :8479 -R mongodb-service:27017
 ```
 
 If you have `soxy` behind an HTTPS ingress or reverse proxy, you need to use 
 
 ```
-soxy proxy -U wss://soxy-server.com -L :8479 -R mongodb-service:27017
+soxy proxy -U wss://soxy-server.com:8080 -L :8479 -R mongodb-service:27017
 ```
 > Notice the extra `s` in `wss`
 

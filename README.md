@@ -42,7 +42,7 @@ mongo --host 127.0.0.1 --port 8479
 ## DEMO
 
 ### docker-compose
-The included [docker-compose.yml]() sets up a demo environment with 
+The included [docker-compose.yml](docker-compose.yml) sets up a demo environment with 
 
 * Frontend and backend networks to mimic real world topologies
 * Backend Redis DB service

@@ -13,5 +13,5 @@ COPY --from=builder /go/bin/soxy /
 RUN apk add --no-cache \
         libc6-compat && \
         chmod +x /soxy
-CMD ["/soxy"]
+ENTRYPOINT ["/soxy"]
 

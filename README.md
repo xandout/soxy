@@ -41,6 +41,37 @@ mongo --host 127.0.0.1 --port 8479
 
 ## DEMO
 
+### docker-compose
+The included [docker-compose.yml]() sets up a demo environment with 
+
+* Frontend and backend networks to mimic real world topologies
+* Backend Redis DB service
+* Backend `soxy` service
+* Frontend nginx service
+* Frontend `soxy` client exposes `backend-redis:6379`
+
+
+Data path is redis-cli -> local TCP socket(soxy) -> websocket connection through nginx -> soxy server -> redis container.
+
+```
+✔ ~/go/src/github.com/xandout/soxy [master|✔] 
+02:10 # docker-compose up -d
+Creating network "soxy_back" with the default driver
+Creating network "soxy_front" with the default driver
+Creating soxy_backend-redis_1 ... done
+Creating soxy_backend-soxy-server_1 ... done
+Creating soxy_frontend-nginx_1      ... done
+Creating soxy_frontend-soxy-client_1 ... done
+✔ ~/go/src/github.com/xandout/soxy [master|✔] 
+02:14 # docker run --rm -it redis redis-cli -h 192.168.0.250 INFO CPU
+# CPU
+used_cpu_sys:0.025931
+used_cpu_user:0.153783
+used_cpu_sys_children:0.001324
+used_cpu_user_children:0.001367
+```
+
+
 ### Just a quick local demo proxying redis
 ```
 ✔ ~/go/src/github.com/xandout/soxy [master|✔] 

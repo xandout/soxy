@@ -1,0 +1,22 @@
+version: '2.4'
+services:
+  backend-redis:
+    image: redis
+    networks:
+      - back
+  frontend-soxy-server:
+    image: xandout/soxy
+    networks:
+      - front
+      - back
+    command: serve -p :8080
+  frontend-soxy-client:
+    image: xandout/soxy
+    networks:
+      - front
+    command: proxy -U ws://frontend-soxy-server:8080 -L :6379 -R backend-redis:6379
+    ports:
+      - 6379:6379
+networks:
+  front:
+  back:

@@ -39,6 +39,46 @@ mongo --host 127.0.0.1 --port 8479
 ```
 
 
+## DEMO
+
+### Just a quick local demo proxying redis
+```
+✔ ~/go/src/github.com/xandout/soxy [master|✔] 
+01:24 # docker run --rm -d -p 6379:6379 redis
+7cefb999a6a23e03883a41776b74304506249ae0368b81cd8308865f826fe404
+✔ ~/go/src/github.com/xandout/soxy [master|✔] 
+01:22 # docker run --rm -d -p 8080:8080 xandout/soxy serve -p :8080
+6690096b456e64baf3223df80f590ea2e0962c8c3f07bcdebcb9b0f25dadb3e6
+✔ ~/go/src/github.com/xandout/soxy [master|✔] 
+01:22 # docker run --rm -d -p 8081:8081 xandout/soxy proxy -U ws://192.168.0.250:8080 -L :8081 -R 192.168.0.250:6379
+423ccbbfa4b6d961f4fb1b740e93bf38bfda9a96d03c56e3f8188b87d4a88d5b
+✔ ~/go/src/github.com/xandout/soxy [master|✔] 
+01:22 # docker run --rm -it redis redis-cli -h 192.168.0.250 -p 8081
+192.168.0.250:8081> INFO CPU
+# CPU
+used_cpu_sys:86.098951
+used_cpu_user:74.249437
+used_cpu_sys_children:0.001757
+used_cpu_user_children:0.000798
+192.168.0.250:8081> 
+```
+
+### Secured traffic over the Internet to a k8s cluster
+```
+01:25 # docker run --rm -d -p 8082:8082 xandout/soxy proxy -U wss://soxy.my-kubernetes-cluster.com -L :8082 -R mongodb-service:27017
+f7393b5b5254bd5c4ad0b4c8cb0ed3ac1cd0dc7c73bef909eca4cdf896bb8865
+✔ ~/go/src/github.com/xandout/soxy [master|✔] 
+01:26 # mongo --host 192.168.0.250 --port 8082
+MongoDB shell version v4.0.3
+connecting to: mongodb://192.168.0.250:8082/
+WARNING: No implicit session: Logical Sessions are only supported on server versions 3.6 and greater.
+Implicit session: dummy session
+MongoDB server version: 3.0.12
+WARNING: shell and server versions do not match
+> show databases;
+local               0.078GB
+> 
+```
 ## Usage
 
 ```

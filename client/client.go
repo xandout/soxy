@@ -1,8 +1,8 @@
 package client
 
 import (
-	"fmt"
 	"net"
+	"net/url"
 	"os"
 
 	"github.com/gorilla/websocket"
@@ -21,17 +21,29 @@ func Start(c *cli.Context) error {
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	log.Info("Listening on " + c.String("local"))
+	log.Infof("Listening on %v", c.String("local"))
+
+	// Otains the websocket URL
+	soxyURL, err := url.Parse(c.String("soxy-url"))
+	if err != nil {
+		log.Errorf("SOXY URL: %v", err.Error())
+		return err
+	}
+	soxyURL.Path = soxyURL.Path + "/" // to keep compability with previous version
+	query := soxyURL.Query()
+	query.Set("remote", c.String("remote"))
+	soxyURL.RawQuery = query.Encode()
+	log.Infof("Forwarding for %v", soxyURL)
+
 	for {
 		// Listen for an incoming connection.
 		tcpConn, err := l.Accept()
 		if err != nil {
 			log.Errorf("TCP ACCEPT: %v", err.Error())
+			return err
 		}
-		fmtString := "%s/?remote=%s"
-		fmted := fmt.Sprintf(fmtString, c.String("soxy-url"), c.String("remote"))
 
-		clientWsConn, _, err := websocket.DefaultDialer.Dial(fmted, nil)
+		clientWsConn, _, err := websocket.DefaultDialer.Dial(soxyURL.String(), nil)
 		if err != nil {
 			log.Errorf("DIALER: %v", err.Error())
 			return err

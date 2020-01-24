@@ -1,4 +1,4 @@
-# SOXY
+# SOXY [![Build Status](https://travis-ci.com/xandout/soxy.svg?branch=master)](https://travis-ci.com/xandout/soxy)
 
 Soxy has a simple design.  Run a `soxy` server behind your Ingress or other HTTP reverse proxy such as nginx.
 

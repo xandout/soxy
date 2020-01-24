@@ -4,19 +4,55 @@ services:
     image: redis
     networks:
       - back
-  frontend-soxy-server:
+  backend-soxy-server:
+    build:
+      context: .
     image: xandout/soxy
+    networks:
+      - back
+    command: serve -p :8080
+    depends_on:
+      - backend-redis
+  frontend-nginx:
+    image: nginx
+    ports:
+      - 8080:8080
     networks:
       - front
       - back
-    command: serve -p :8080
+    command: 
+      - /bin/bash
+      - -c
+      - |
+        echo $$NGINX_CONF > /etc/nginx/conf.d/soxy.conf
+        nginx -g "daemon off;"
+    environment:
+      - NGINX_CONF=
+        server {
+          server_name localhost;
+          listen 8080;
+          location / {
+            proxy_set_header Upgrade $$http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_pass http://backend-soxy-server:8080;
+          }
+        }
+    depends_on:
+      - backend-redis
+      - backend-soxy-server
   frontend-soxy-client:
+    build:
+      context: .
     image: xandout/soxy
     networks:
       - front
-    command: proxy -U ws://frontend-soxy-server:8080 -L :6379 -R backend-redis:6379
+    command: proxy -U ws://frontend-nginx:8080 -L :6379 -R backend-redis:6379
     ports:
       - 6379:6379
+    depends_on:
+      - backend-redis
+      - backend-soxy-server
+      - frontend-nginx
 networks:
   front:
   back:

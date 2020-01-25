@@ -35,7 +35,8 @@ func main() {
 			Name:  "serve",
 			Usage: "Start proxying traffic(server)",
 			Flags: []cli.Flag{
-				&cli.StringFlag{Name: "port", Aliases: []string{"p"}},
+				&cli.StringFlag{Name: "port", Aliases: []string{"p"}, Usage: "Which local port to listen on.\n\tExample: :3306 or 0.0.0.0:3306"},
+				&cli.StringFlag{Name: "api-key", Aliases: []string{"k"}, Usage: "API Key to authenticate clients\n\tExample: myverysecretkey"},
 			},
 			Action: server.Start,
 		},
@@ -46,6 +47,7 @@ func main() {
 				&cli.StringFlag{Name: "soxy-url", Aliases: []string{"U"}, Usage: "ws://soxy-daemon.com:8080"},
 				&cli.StringFlag{Name: "local", Aliases: []string{"L"}, Usage: "Which local port to listen on.\n\tExample: :3306 or 0.0.0.0:3306"},
 				&cli.StringFlag{Name: "remote", Aliases: []string{"R"}, Usage: "Where should the daemon proxy traffic to?\n\tExample: mysql-service:3306"},
+				&cli.StringFlag{Name: "api-key", Aliases: []string{"k"}, Usage: "API Key to authenticate proxy\n\tExample: myverysecretkey"},
 			},
 			Action: client.Start,
 		},

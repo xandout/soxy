@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 
 	"github.com/gorilla/websocket"
@@ -31,7 +32,13 @@ func Start(c *cli.Context) error {
 		fmtString := "%s/?remote=%s"
 		fmted := fmt.Sprintf(fmtString, c.String("soxy-url"), c.String("remote"))
 
-		clientWsConn, _, err := websocket.DefaultDialer.Dial(fmted, nil)
+		headers := make(http.Header)
+		apiKey := c.String("api-key")
+		if apiKey != "" {
+			headers.Set("X-Api-Key", apiKey)
+		}
+
+		clientWsConn, _, err := websocket.DefaultDialer.Dial(fmted, headers)
 		if err != nil {
 			log.Errorf("DIALER: %v", err.Error())
 			return err

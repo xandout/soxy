@@ -1,6 +1,7 @@
 package client
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"os"
@@ -30,6 +31,10 @@ func Start(c *cli.Context) error {
 		}
 		fmtString := "%s/?remote=%s"
 		fmted := fmt.Sprintf(fmtString, c.String("soxy-url"), c.String("remote"))
+
+		if c.Bool("insecure") {
+			websocket.DefaultDialer.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		}
 
 		clientWsConn, _, err := websocket.DefaultDialer.Dial(fmted, nil)
 		if err != nil {

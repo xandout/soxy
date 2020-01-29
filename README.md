@@ -142,7 +142,8 @@ OPTIONS:
                                Example: :3306 or 0.0.0.0:3306
    --remote value, -R value    Where should the daemon proxy traffic to?
                                Example: mysql-service:3306
-   --help, -h                  show help (default: false)   
+   --insecure                  Allow insecure server connections when using TLS (default: false)
+   --help, -h                  show help (default: false)
 
 
 # soxy serve -h

@@ -46,6 +46,7 @@ func main() {
 				&cli.StringFlag{Name: "soxy-url", Aliases: []string{"U"}, Usage: "ws://soxy-daemon.com:8080"},
 				&cli.StringFlag{Name: "local", Aliases: []string{"L"}, Usage: "Which local port to listen on.\n\tExample: :3306 or 0.0.0.0:3306"},
 				&cli.StringFlag{Name: "remote", Aliases: []string{"R"}, Usage: "Where should the daemon proxy traffic to?\n\tExample: mysql-service:3306"},
+				&cli.BoolFlag{Name: "insecure", Usage: "Allow insecure server connections when using TLS"},
 			},
 			Action: client.Start,
 		},

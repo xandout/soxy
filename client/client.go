@@ -1,6 +1,7 @@
 package client
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"os"
@@ -22,6 +23,7 @@ func Start(c *cli.Context) error {
 	// Close the listener when the application closes.
 	defer l.Close()
 	log.Info("Listening on " + c.String("local"))
+	websocket.DefaultDialer.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	for {
 		// Listen for an incoming connection.
 		tcpConn, err := l.Accept()

@@ -2,7 +2,9 @@ package client
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 
@@ -23,7 +25,33 @@ func Start(c *cli.Context) error {
 	// Close the listener when the application closes.
 	defer l.Close()
 	log.Info("Listening on " + c.String("local"))
-	websocket.DefaultDialer.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
+	insecureSkipVerify := c.String("InsecureSkipVerify")
+	caPath := c.String("caPath")
+	clientCertPath := c.String("clientCertPath")
+	clientKeyPath := c.String("clientKeyPath")
+	pool := x509.NewCertPool()
+	caCrt, err := ioutil.ReadFile(caPath)
+	if err != nil {
+		log.Fatal("read ca.crt file error:", err.Error())
+	}
+	pool.AppendCertsFromPEM(caCrt)
+
+	cliCrt, err := tls.LoadX509KeyPair(clientCertPath, clientKeyPath)
+	if err != nil {
+		fmt.Println("Loadx509keypair err:", err)
+		return err
+	}
+
+	if "yes" == insecureSkipVerify {
+		websocket.DefaultDialer.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	} else {
+		websocket.DefaultDialer.TLSClientConfig = &tls.Config{
+			RootCAs:      pool,
+			Certificates: []tls.Certificate{cliCrt},
+		}
+	}
+
 	for {
 		// Listen for an incoming connection.
 		tcpConn, err := l.Accept()
@@ -36,7 +64,7 @@ func Start(c *cli.Context) error {
 		clientWsConn, _, err := websocket.DefaultDialer.Dial(fmted, nil)
 		if err != nil {
 			log.Errorf("DIALER: %v", err.Error())
-			return err
+			//return err  never stop client process
 		}
 		// Handle connections in a new goroutine.
 		log.Infof("Proxying traffic to %v via %v for %v", c.String("remote"), clientWsConn.RemoteAddr(), tcpConn.RemoteAddr())

@@ -30,27 +30,34 @@ func Start(c *cli.Context) error {
 	caPath := c.String("caPath")
 	clientCertPath := c.String("clientCertPath")
 	clientKeyPath := c.String("clientKeyPath")
-	pool := x509.NewCertPool()
-	caCrt, err := ioutil.ReadFile(caPath)
-	if err != nil {
-		log.Fatal("read ca.crt file error:", err.Error())
-	}
-	pool.AppendCertsFromPEM(caCrt)
-
-	cliCrt, err := tls.LoadX509KeyPair(clientCertPath, clientKeyPath)
-	if err != nil {
-		fmt.Println("Loadx509keypair err:", err)
-		return err
-	}
+	tslConfig := &tls.Config{}
 
 	if "yes" == insecureSkipVerify {
-		websocket.DefaultDialer.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		tslConfig.InsecureSkipVerify = true
 	} else {
-		websocket.DefaultDialer.TLSClientConfig = &tls.Config{
-			RootCAs:      pool,
-			Certificates: []tls.Certificate{cliCrt},
-		}
+		tslConfig.InsecureSkipVerify = false
 	}
+
+	if caPath != "" {
+		pool := x509.NewCertPool()
+		caCrt, err := ioutil.ReadFile(caPath)
+		if err != nil {
+			log.Fatal("read ca.crt file error:", err.Error())
+		}
+		pool.AppendCertsFromPEM(caCrt)
+		tslConfig.RootCAs = pool
+	}
+
+	if clientCertPath != "" && clientKeyPath != "" {
+		cliCrt, err := tls.LoadX509KeyPair(clientCertPath, clientKeyPath)
+		if err != nil {
+			fmt.Println("Loadx509keypair err:", err)
+			return err
+		}
+		tslConfig.Certificates = []tls.Certificate{cliCrt}
+	}
+
+	websocket.DefaultDialer.TLSClientConfig = tslConfig
 
 	for {
 		// Listen for an incoming connection.

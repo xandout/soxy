@@ -16,11 +16,12 @@ limitations under the License.
 package main
 
 import (
+	"os"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"github.com/xandout/soxy/client"
 	"github.com/xandout/soxy/server"
-	"os"
 )
 
 func main() {
@@ -46,6 +47,10 @@ func main() {
 				&cli.StringFlag{Name: "soxy-url", Aliases: []string{"U"}, Usage: "ws://soxy-daemon.com:8080"},
 				&cli.StringFlag{Name: "local", Aliases: []string{"L"}, Usage: "Which local port to listen on.\n\tExample: :3306 or 0.0.0.0:3306"},
 				&cli.StringFlag{Name: "remote", Aliases: []string{"R"}, Usage: "Where should the daemon proxy traffic to?\n\tExample: mysql-service:3306"},
+				&cli.StringFlag{Name: "InsecureSkipVerify", Aliases: []string{"nv"}, Usage: "do not v?\n\tExample: -nv yes (yes or no)"},
+				&cli.StringFlag{Name: "caPath", Aliases: []string{"ca"}, Usage: "ca cert path?\n\tExample: -ca /cert/root.crt"},
+				&cli.StringFlag{Name: "clientCertPath", Aliases: []string{"clc"}, Usage: "client cert path?\n\tExample: -clc /cert/client.crt"},
+				&cli.StringFlag{Name: "clientKeyPath", Aliases: []string{"clk"}, Usage: "client cert key path?\n\tExample: -clk /cert/client.key"},
 			},
 			Action: client.Start,
 		},

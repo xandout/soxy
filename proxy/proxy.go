@@ -23,7 +23,7 @@ func chanFromConn(conn net.Conn) chan []byte {
 				c <- res
 			}
 			if err != nil {
-				c <- nil
+				//c <- nil //fix more 0x00 data bug
 				break
 			}
 		}
